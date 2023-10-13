@@ -1,5 +1,7 @@
 import 'package:dioproject/model/bmi_detail.dart';
 import 'package:dioproject/repositories/bmi_repository.dart';
+import 'package:dioproject/services/app_storage_service.dart';
+import 'package:dioproject/shared/widgets/custom_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -12,7 +14,12 @@ class BmiRecordsPage extends StatefulWidget {
 
 class _BmiRecordsPageState extends State<BmiRecordsPage> {
   BmiRepository bmiRepository = BmiRepository();
+  AppStorageService storage = AppStorageService();
+
+  String userName = '';
+  String userEmail = '';
   var _bmiRecords = <BmiDetail>[];
+
   TextEditingController _dateController = TextEditingController();
   TextEditingController _weightController = TextEditingController();
   TextEditingController _heightController = TextEditingController();
@@ -21,6 +28,7 @@ class _BmiRecordsPageState extends State<BmiRecordsPage> {
   void initState() {
     super.initState();
     getBmiRecords();
+    _loadData();
   }
 
   void getBmiRecords() async {
@@ -28,9 +36,20 @@ class _BmiRecordsPageState extends State<BmiRecordsPage> {
     setState(() {});
   }
 
+  _loadData() async {
+    userName = await storage.getUserName();
+    userEmail = await storage.getUserEmail();
+    setState(() {
+      userName = userName;
+      userEmail = userEmail;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: CustomDrawer(
+          userName: userName, userEmail: userEmail),
       appBar: AppBar(
         title: const Text("BMI Records"),
       ),
@@ -152,10 +171,14 @@ class _BmiRecordsPageState extends State<BmiRecordsPage> {
             padding: const EdgeInsets.only(top: 16),
             child: ListTile(
               leading: const Icon(Icons.monitor_weight),
-              title: Text(formattedDate, style: const TextStyle(fontSize: 18),),
+              title: Text(
+                formattedDate,
+                style: const TextStyle(fontSize: 18),
+              ),
               subtitle: Text(
                 'Weight: $formattedWeight | Height: $formattedHeight m | BMI: $formattedBmi\nClassification: $bmiClassification.',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                style:
+                    const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
             ),
           );
