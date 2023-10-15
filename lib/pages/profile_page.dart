@@ -15,7 +15,6 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController emailController = TextEditingController();
   AppStorageService storage = AppStorageService();
 
-
   @override
   void initState() {
     super.initState();
@@ -25,10 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
   _loadData() async {
     nameController.text = await storage.getUserName();
     emailController.text = await storage.getUserEmail();
-    setState(() {
-      nameController.text = nameController.text;
-      emailController.text = emailController.text;
-    });
+    setState(() {});
   }
 
   _saveData() async {
