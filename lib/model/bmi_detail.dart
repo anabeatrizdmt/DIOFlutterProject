@@ -1,16 +1,16 @@
 import 'package:flutter/cupertino.dart';
 
 class BmiDetail {
-  String _id = UniqueKey().toString();
+  int _id;
   DateTime _date;
   double _weight;
   double _height;
   double? _bmi;
   String? _bmiClassification;
 
-  BmiDetail(this._date, this._weight, this._height) {
+  BmiDetail(this._id, this._date, this._weight, this._height) {
     _bmi = calculateBmi();
-    _bmiClassification = bmiClassificatior(_bmi!);
+    _bmiClassification = bmiClassificationTerm(_bmi!);
   }
 
   calculateBmi() {
@@ -21,7 +21,7 @@ class BmiDetail {
     return (_weight / (heightInMeters * heightInMeters));
   }
 
-  String bmiClassificatior(double bmi) {
+  String bmiClassificationTerm(double bmi) {
     switch (bmi) {
       case < 16:
         return 'Severe Thinness';
@@ -44,18 +44,17 @@ class BmiDetail {
     }
   }
 
-  String get id => _id;
+  int get id => _id * 1;
+  set id(int id) {
+    _id = id;
+  }
 
-  double? get bmi => _bmi;
-
-  String? get bmiClassification => _bmiClassification;
-
-  double get height => _height;
+  double get height => _height * 1;
   set height(double value) {
     _height = value;
   }
 
-  double get weight => _weight;
+  double get weight => _weight * 1;
   set weight(double value) {
     _weight = value;
   }
@@ -64,4 +63,8 @@ class BmiDetail {
   set date(DateTime value) {
     _date = value;
   }
+
+  double? get bmi => _bmi;
+
+  String? get bmiClassification => _bmiClassification;
 }
