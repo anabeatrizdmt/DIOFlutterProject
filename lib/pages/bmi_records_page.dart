@@ -36,7 +36,7 @@ class _BmiRecordsPageState extends State<BmiRecordsPage> {
   }
 
   void getBmiRecords() async {
-    _bmiRecords = bmiRepository.list();
+    _bmiRecords = await bmiRepository.getData();
     setState(() {});
   }
 
@@ -68,7 +68,6 @@ class _BmiRecordsPageState extends State<BmiRecordsPage> {
         onPressed: () {
           _dateController.text = "";
           _weightController.text = "";
-
           showDialog(
               context: context,
               builder: (BuildContext bc) {
@@ -135,11 +134,15 @@ class _BmiRecordsPageState extends State<BmiRecordsPage> {
                                 double.tryParse(_heightController.text) ?? 0.0;
                             double weight =
                                 double.tryParse(_weightController.text) ?? 0.0;
+                            debugPrint("bmiRepository save");
+                            final newBmiRecord =
+                                BmiDetail(0, selectedDate, weight, height);
 
-                            bmiRepository
-                                .add(BmiDetail(selectedDate, weight, height));
+                            bmiRepository.save(newBmiRecord);
                             Navigator.pop(context);
-                            setState(() {});
+                            setState(() {
+                              _bmiRecords.add(newBmiRecord);
+                            });
                           } else {
                             showDialog(
                               context: context,
@@ -257,18 +260,46 @@ class _BmiRecordsPageState extends State<BmiRecordsPage> {
                 final bmiClassification =
                     bmiRecord.bmiClassification?.toString();
 
-                return Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: ListTile(
-                    leading: const Icon(Icons.monitor_weight),
-                    title: Text(
-                      formattedDate,
-                      style: const TextStyle(fontSize: 18),
+                return Dismissible(
+                  key: UniqueKey(),
+                  background: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: const Icon(
+                      Icons.delete,
+                      color: Colors.white,
                     ),
-                    subtitle: Text(
-                      'Weight: $formattedWeight | Height: $formattedHeight m | BMI: $formattedBmi\nClassification: $bmiClassification.',
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  secondaryBackground: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: const Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                    ),
+                  ),
+                  onDismissed: (direction) {
+                    final deletedRecord = _bmiRecords[index];
+                    bmiRepository.delete(deletedRecord);
+                    setState(() {
+                      _bmiRecords.removeAt(index);
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: ListTile(
+                      leading: const Icon(Icons.monitor_weight),
+                      title: Text(
+                        formattedDate,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      subtitle: Text(
+                        'Weight: $formattedWeight | Height: $formattedHeight m | BMI: $formattedBmi\nClassification: $bmiClassification.',
+                        style: const TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w500),
+                      ),
                     ),
                   ),
                 );
